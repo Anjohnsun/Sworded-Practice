@@ -4,16 +4,11 @@
 
 Материалы:
 [Игра](https://play.google.com/store/apps/details?id=master.sworded.io)
-
-
 [2021.3.14f1](https://unity.com/releases/editor/whats-new/2021.3.14#release-notes)
-
 [https://github.com/koro-games/Sworded-Practice](https://github.com/koro-games/Sworded-Practice)
-
-Описание работы: Часто в работе случаются ситуации, когда надо поддерживать старый проект, при этом худшая ситуация, когда проект написан плохо а старого, разработчика больше нет. В таких проектах перед началом проекта надо изучить сам проект.
+[Пояснения]https://github.com/users/Anjohnsun/projects/1
 
 Задачи:
-
 1. Сохранить себе проект
     1. Сделать форк проекта для работы в нем
 2. Разобрать код проекта
