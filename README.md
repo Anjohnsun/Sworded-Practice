@@ -6,7 +6,8 @@
 [Игра](https://play.google.com/store/apps/details?id=master.sworded.io)
 [2021.3.14f1](https://unity.com/releases/editor/whats-new/2021.3.14#release-notes)
 [https://github.com/koro-games/Sworded-Practice](https://github.com/koro-games/Sworded-Practice)
-[Пояснения]https://github.com/users/Anjohnsun/projects/1
+
+[Доп. материалы по проекту](https://github.com/users/Anjohnsun/projects/1)
 
 Задачи:
 1. Сохранить себе проект
