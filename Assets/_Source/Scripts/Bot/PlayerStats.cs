@@ -11,8 +11,8 @@ public class PlayerStats : MonoBehaviour
     public bool botface;
     public int HP;
     public int MaxHP;
-    public float Damage=1;
-    public int Level=1;
+    public float Damage = 1;
+    public int Level = 1;
     public int Points;
     [Header("Tech")]
     public Animator animator;
@@ -50,6 +50,9 @@ public class PlayerStats : MonoBehaviour
     public DamageSounder sounder;
     public float damagemod = 1;
     public bool vampire;
+
+    private bool _preSpawned;
+
     private void Start()
     {
         if (!player)
@@ -57,10 +60,10 @@ public class PlayerStats : MonoBehaviour
             if (PlayerPrefs.GetInt("Internet") == 1) botface = false;
             else botface = true;
         }
-        
+
         if (!botface) nameText.text = "Player" + Random.Range(1000, 10000);
         if (player) nameText.text = PlayerPrefs.GetString("Name");
-        if (gameUI==null) gameUI = GameUI.instance;
+        if (gameUI == null) gameUI = GameUI.instance;
         Name = nameText.text;
         HolderStats = GameObject.FindGameObjectWithTag("HolderStats").GetComponent<RectTransform>();
         UI_Element = GetComponent<RectTransform>();
@@ -71,8 +74,39 @@ public class PlayerStats : MonoBehaviour
         AddHP(0);
         AddPoints(0);
         movement = Player.GetComponent<BotMovement>();
-        if (player&&PlayerPrefs.GetInt("Vibro") == 0) vibro = true;
+        if (player && PlayerPrefs.GetInt("Vibro") == 0) vibro = true;
         //DamageVignette = gameUI.DamageVignette;
+
+
+        _preSpawned = false;
+    }
+
+    private void OnEnable()
+    {
+        if (!_preSpawned)
+        {
+            if (!player)
+            {
+                if (PlayerPrefs.GetInt("Internet") == 1) botface = false;
+                else botface = true;
+            }
+
+            if (!botface) nameText.text = "Player" + Random.Range(1000, 10000);
+            if (player) nameText.text = PlayerPrefs.GetString("Name");
+            if (gameUI == null) gameUI = GameUI.instance;
+            Name = nameText.text;
+            HolderStats = GameObject.FindGameObjectWithTag("HolderStats").GetComponent<RectTransform>();
+            UI_Element = GetComponent<RectTransform>();
+            Cam = Camera.main;
+            transform.parent = HolderStats;
+            startsize = Cam.fieldOfView;
+            HP = MaxHP;
+            AddHP(0);
+            AddPoints(0);
+            movement = Player.GetComponent<BotMovement>();
+            if (player && PlayerPrefs.GetInt("Vibro") == 0) vibro = true;
+            //DamageVignette = gameUI.DamageVignette;
+        }
     }
 
     private void Update()
@@ -84,22 +118,22 @@ public class PlayerStats : MonoBehaviour
         ((ViewportPosition.y * HolderStats.sizeDelta.y) - (HolderStats.sizeDelta.y * 0.5f)));
         UI_Element.localScale = Vector2.one * startsize / Cam.fieldOfView;
         //now you can set the position of the ui element
-        UI_Element.anchoredPosition =Vector2.Lerp(UI_Element.anchoredPosition, WorldObject_ScreenPosition, 8*Time.deltaTime);
-        damageLine.localScale = Vector3.up + Vector3.right * Mathf.MoveTowards(damageLine.localScale.x, healtyLine.localScale.x, Time.deltaTime/3);
+        UI_Element.anchoredPosition = Vector2.Lerp(UI_Element.anchoredPosition, WorldObject_ScreenPosition, 8 * Time.deltaTime);
+        damageLine.localScale = Vector3.up + Vector3.right * Mathf.MoveTowards(damageLine.localScale.x, healtyLine.localScale.x, Time.deltaTime / 3);
     }
     public void AddHP(int hp)
     {
         // if(hp<0) DamageVignette.SetActive(true);
         if (gameUI.Stats.Count > 1)
         {
-            
+
             PlayerStats playerStats = gameUI.Stats[lastHit];
-            hp = (int)(hp * playerStats.MaxHP* playerStats.Damage * playerStats.damagemod / 100);
+            hp = (int)(hp * playerStats.MaxHP * playerStats.Damage * playerStats.damagemod / 100);
             if (hp < 0 && playerStats.vampire)
             {
 
-                gameUI.Stats[lastHit].AddHP(-hp/4);
-                
+                gameUI.Stats[lastHit].AddHP(-hp / 4);
+
             }
         }
         HP += hp;
@@ -107,7 +141,7 @@ public class PlayerStats : MonoBehaviour
         {
             healtyLineAnim.Play();
         }
-        if (hp < 0) 
+        if (hp < 0)
         {
 
             if (!botface)
@@ -116,8 +150,8 @@ public class PlayerStats : MonoBehaviour
                 sounder.PlayOuch();
             }
             DamageAnim.Play();
-            DamageText.text=(-hp).ToString(); 
-            DamageText.fontSize=Mathf.Clamp(-hp * 160 / MaxHP, 50,85);
+            DamageText.text = (-hp).ToString();
+            DamageText.fontSize = Mathf.Clamp(-hp * 160 / MaxHP, 50, 85);
             if (-hp > MaxHP / 4)
             {
                 DamageText.color = Color.red;
@@ -127,14 +161,14 @@ public class PlayerStats : MonoBehaviour
                 }
             }
             else DamageText.color = Color.white;
-            DamageText.transform.localPosition=Vector3.right * Random.Range(-50, 50) + Vector3.forward *Random.Range(-50, 50);
+            DamageText.transform.localPosition = Vector3.right * Random.Range(-50, 50) + Vector3.forward * Random.Range(-50, 50);
         }
 
 
         HP = Mathf.Clamp(HP, 0, MaxHP);
         healtyText.text = HP.ToString();
         healtyLine.localScale = Vector3.up + Vector3.right * ((float)HP / MaxHP);
-        if (HP<=0)
+        if (HP <= 0)
         {
             Death();
         }
@@ -149,7 +183,7 @@ public class PlayerStats : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.5f);
 
-        while (Time.timeScale<1)
+        while (Time.timeScale < 1)
         {
             Time.timeScale += 0.01f;
             yield return new WaitForSecondsRealtime(0.01f);
@@ -162,10 +196,10 @@ public class PlayerStats : MonoBehaviour
     {
         int d = (int)(Points - 5 * balance.XPcoeff * (Level - 1) * (Level + balance.XPcoeff - 1));
         AddPoints(-d);
-        if (p!=0)
-        gameUI.Stats[p].AddPoints((int)(d*1.5f + 25));
+        if (p != 0)
+            gameUI.Stats[p].AddPoints((int)(d * 1.5f + 25));
         else
-        gameUI.Stats[p].AddPoints(d + 25);
+            gameUI.Stats[p].AddPoints(d + 25);
         /*if (d > 10)
         {
             Transform rb = Instantiate(PointObj, pos, Quaternion.identity);
@@ -212,7 +246,7 @@ public class PlayerStats : MonoBehaviour
     {
         Points += points;
         float pointsCL = 5 * balance.XPcoeff * (Level) * (Level + balance.XPcoeff);
-        float pointsPL = 5 * balance.XPcoeff * (Level-1) * (Level-1 + balance.XPcoeff);
+        float pointsPL = 5 * balance.XPcoeff * (Level - 1) * (Level - 1 + balance.XPcoeff);
         if (points > 0)
         {
             if (player)
@@ -228,20 +262,20 @@ public class PlayerStats : MonoBehaviour
         if (Points > (5 * balance.XPcoeff * (Level) * (Level + balance.XPcoeff)))
         {
             if (!botface) animator.SetTrigger("Level");
-            AddLevel(); 
+            AddLevel();
         }
         else if (!botface) animator.SetTrigger("Point");
 
         AddHP((int)(10 * Mathf.Pow((float)Level, balance.HPcoeff)));
-        if (Level>1) gameUI.FindKing();
+        if (Level > 1) gameUI.FindKing();
         if (Points > 1) gameUI.checkPlayers();
-        LevelLine.fillAmount = 0.81f * ((Points- pointsPL) / ((5 * balance.XPcoeff * (Level) * (Level + balance.XPcoeff)) - pointsPL));
+        LevelLine.fillAmount = 0.81f * ((Points - pointsPL) / ((5 * balance.XPcoeff * (Level) * (Level + balance.XPcoeff)) - pointsPL));
         LevelText.text = (Level).ToString();
     }
     void AddLevel()
     {
         Level++;
-        NewLevel.transform.localScale = Vector3.one*1.5f;
+        NewLevel.transform.localScale = Vector3.one * 1.5f;
         if (Points > (5 * balance.XPcoeff * (Level) * (Level + balance.XPcoeff))) AddLevel();
         else
         {

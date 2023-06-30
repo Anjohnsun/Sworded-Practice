@@ -23,16 +23,22 @@ public class GameUI : MonoBehaviour
 
     [Header("EndGame")]
     public GameObject EndMenu;
+    public GameObject EndMenuSurvival;
+    public Text[] SurvivedTimeMinutes;
+    public Text[] SurvivedTimeSeconds;
+    private float _survivedTime;
     public GameObject Victory;
     public GameObject Defeat;
     public GameObject Whistle;
     public GameObject HolderStats;
     bool finish;
+
     [Header("Modes")]
     public GameObject[] Mode;
     public int mode;
     public int alive = 6;
     public Text Alive;
+
     [Header("PlayersCheck")]
     public Text[] PlayerCheck;
     public Text[] PlayerScore;
@@ -42,6 +48,7 @@ public class GameUI : MonoBehaviour
     bool win;
     public Text[] PlayerCheckEnd;
     public Text[] PlayerScoreEnd;
+
     [Header("Progress")]
     public Image ProgressLine;
     public GameObject NewLevel;
@@ -50,6 +57,8 @@ public class GameUI : MonoBehaviour
     public Text LineText;
     public Text LevelText;
     public Text PlayerPosText;
+    
+    [SerializeField] private int _pointsPerSecond;
 
     public void checkPlayersEnd()
     {
@@ -77,7 +86,7 @@ public class GameUI : MonoBehaviour
                 PlayerPosText.text = "Place: " + (i + 1);
             }
             else PlayerCheckEnd[i].fontStyle = FontStyle.Normal;
-            
+
         }
 
     }
@@ -85,6 +94,7 @@ public class GameUI : MonoBehaviour
     {
         //Time.timeScale = 0.5f;
         Application.targetFrameRate = 60;
+        _survivedTime = 0;
     }
     public void MenuSkill()
     {
@@ -93,14 +103,14 @@ public class GameUI : MonoBehaviour
     }
     void SkillProgresss(int xp)
     {
-        LevelText.text= PlayerPrefs.GetInt("Level").ToString();
+        LevelText.text = PlayerPrefs.GetInt("Level").ToString();
         PlusText.text = "+" + xp;
 
         NextButton.interactable = false;
-        float clevel=0;
-        float nlevel =0;
+        float clevel = 0;
+        float nlevel = 0;
 
-        if (PlayerPrefs.GetInt("Level") < balance.level.Length-1)
+        if (PlayerPrefs.GetInt("Level") < balance.level.Length - 1)
         {
             clevel = balance.level[PlayerPrefs.GetInt("Level")].Points;
             nlevel = balance.level[PlayerPrefs.GetInt("Level") + 1].Points;
@@ -108,13 +118,13 @@ public class GameUI : MonoBehaviour
         else
         {
             clevel = PlayerPrefs.GetInt("Level") * 3000;
-            nlevel = (PlayerPrefs.GetInt("Level")+1) * 3000;
+            nlevel = (PlayerPrefs.GetInt("Level") + 1) * 3000;
         }
 
         float cpoints = PlayerPrefs.GetInt("XP");
         //ProgressLine.fillAmount = 
-        float start = (cpoints - clevel)/ (nlevel- clevel);
-        float finish = (cpoints+xp - clevel)/ (nlevel - clevel);
+        float start = (cpoints - clevel) / (nlevel - clevel);
+        float finish = (cpoints + xp - clevel) / (nlevel - clevel);
         StartCoroutine(ProgressLineMove(start, finish, xp, clevel, nlevel));
 
     }
@@ -122,33 +132,33 @@ public class GameUI : MonoBehaviour
     {
 
         int cpoints = PlayerPrefs.GetInt("XP");
-        
-        float scale = (finish-start)/100;
+
+        float scale = (finish - start) / 100;
         //Debug.Log(start + "/" + finish);
         LineText.text = (cpoints) + "/" + nlevel;
         ProgressLine.fillAmount = start;
         float add = 0;
         yield return new WaitForSeconds(1f);
         GetComponent<AudioSource>().Play();
-        while (start<finish)
+        while (start < finish)
         {
             start += scale;
             add += 0.01f;
-            LineText.text = (int)(cpoints + xp * add) + "/"+nlevel;
+            LineText.text = (int)(cpoints + xp * add) + "/" + nlevel;
             ProgressLine.fillAmount = start;
             yield return new WaitForSeconds(0.01f);
         }
         LineText.text = (int)(cpoints + xp) + "/" + nlevel;
         NextButton.interactable = true;
-        PlayerPrefs.SetInt("XP", cpoints+ xp);
-        for (int i = PlayerPrefs.GetInt("Level")+1; i < balance.level.Length; i++)
+        PlayerPrefs.SetInt("XP", cpoints + xp);
+        for (int i = PlayerPrefs.GetInt("Level") + 1; i < balance.level.Length; i++)
         {
             if (cpoints + xp >= balance.level[i].Points)
             {
                 PlayerPrefs.SetInt("Level", PlayerPrefs.GetInt("Level") + 1);
                 LevelText.text = PlayerPrefs.GetInt("Level").ToString();
                 NewLevel.SetActive(true);
-                PlayerPrefs.SetInt("NewSkill",1);
+                PlayerPrefs.SetInt("NewSkill", 1);
             }
         }
     }
@@ -195,7 +205,7 @@ public class GameUI : MonoBehaviour
     {
         alive--;
         Alive.text = alive.ToString();
-        if (alive == 1) EndGame();
+        if (alive == 1 && mode != 2) EndGame();
     }
     public void StartGame()
     {
@@ -213,8 +223,8 @@ public class GameUI : MonoBehaviour
         if (mode == 0)
         {
             PlayerPrefs.SetInt("Wins", PlayerPrefs.GetInt("Wins") + 1);
-            int XP = PlayerStat.Points+ kills * 50;
-            
+            int XP = PlayerStat.Points + kills * 50;
+
 
             checkPlayersEnd();
             List<PlayerStats> CheckStats = Stats;
@@ -234,12 +244,12 @@ public class GameUI : MonoBehaviour
                 //EventSenderManager.SendLevelFinish(0, 0, mode == 0 ? "supriority" : "royale");
             }
             SkillProgresss(XP);
-            
+
         }
-        else
+        if (mode == 1)
         {
-            int XP = kills*200;
-            
+            int XP = kills * 200;
+
 
             FinishRating.SetActive(false);
             if (win)
@@ -248,7 +258,7 @@ public class GameUI : MonoBehaviour
                 Victory.SetActive(true);
                 PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") + 100);
                 PlayerPrefs.SetInt("Wins", PlayerPrefs.GetInt("Wins") + 1);
-               // EventSenderManager.SendLevelFinish(0, 100, mode == 0 ? "supriority" : "royale");
+                // EventSenderManager.SendLevelFinish(0, 100, mode == 0 ? "supriority" : "royale");
             }
             else
             {
@@ -256,12 +266,20 @@ public class GameUI : MonoBehaviour
                 if (PlayerPrefs.GetInt("Wins") > 0)
                     PlayerPrefs.SetInt("Wins", PlayerPrefs.GetInt("Wins") - 1);
                 // EventSenderManager.SendLevelFinish(0, 0, mode == 0 ? "supriority" : "royale");
-                PlayerPosText.text = "Place: " + (alive+1);
+                PlayerPosText.text = "Place: " + (alive + 1);
             }
             SkillProgresss(XP);
-
-            
         }
+        if (mode == 2)
+        {
+            int XP = Mathf.RoundToInt(_survivedTime) * _pointsPerSecond;
+            //логика увеличения опыта
+            EndMenuSurvival.SetActive(true);
+
+
+            SkillProgresss(XP);
+        }
+
         HolderStats.SetActive(false);
         finish = true;
     }
@@ -333,17 +351,24 @@ public class GameUI : MonoBehaviour
     }
     private void Update()
     {
-       // Debug.Log(Application.targetFrameRate);
+        // Debug.Log(Application.targetFrameRate);
         if (shakeTimer > 0) ShakeTime();
 
         //if (Input.GetMouseButton(0) && !finish)
         if (!finish)
         {
+            _survivedTime += Time.deltaTime;
+
+            foreach (Text text in SurvivedTimeMinutes)
+                text.text = (Mathf.RoundToInt(_survivedTime) / 60).ToString();
+            foreach (Text text in SurvivedTimeSeconds)
+                text.text = Mathf.RoundToInt(_survivedTime - (Mathf.RoundToInt(_survivedTime) / 60) * 60).ToString();
+
             cinemachine.m_Lens.FieldOfView = Mathf.Lerp(cinemachine.m_Lens.FieldOfView, 28
                 //* Mathf.Clamp(Stats[0].movement.rb.velocity.magnitude/5,1,1.4f)
                 //* Time.timeScale
                 , 2 * Time.deltaTime);
-          //  Debug.Log(Stats[0].movement.rb.velocity.magnitude);
+            //  Debug.Log(Stats[0].movement.rb.velocity.magnitude);
         }
         else
         {

@@ -56,6 +56,12 @@ public class BotMovement : MonoBehaviour
             rotspeed *= Mathf.Clamp(0.5f + 0.05f * AIDifficulty, 0.5f, 1.1f);
         }
     }
+
+    private void OnEnable()
+    {
+        RandomBehavior();
+    }
+
     private void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.tag == "Boost")
@@ -282,4 +288,5 @@ Vector3.forward * Sword.localPosition.z;
 
         }
     }
+
 }

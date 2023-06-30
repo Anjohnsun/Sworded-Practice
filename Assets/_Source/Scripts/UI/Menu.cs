@@ -47,7 +47,7 @@ public class Menu : MonoBehaviour
             NewSkill.SetActive(true);
             PlayerPrefs.SetInt("NewSkill", 0);
         }
-            Time.timeScale = 1;
+        Time.timeScale = 1;
         for (int i = 0; i < Weapon.Length; i++)
         {
             if (PlayerPrefs.GetInt("UWeapon" + i) == 0)
@@ -56,7 +56,7 @@ public class Menu : MonoBehaviour
                     Weapon[i].mesh[a].material = LockedWeaponMat;
                 }
         }
-        Wins.text = (PlayerPrefs.GetInt("Level")+1).ToString();
+        Wins.text = (PlayerPrefs.GetInt("Level") + 1).ToString();
         PlayerPrefs.SetInt("UWeapon0", 1);
         PlayerPrefs.SetInt("USkin0", 1);
         ChangeSkin(PlayerPrefs.GetInt("CSkin"));
@@ -64,7 +64,7 @@ public class Menu : MonoBehaviour
         //LevelLine.fillAmount = 0.81f * PlayerPrefs.GetInt("Points");
         //Level.text = ((int)(Mathf.Pow(PlayerPrefs.GetInt("Points"), 2 / 3) / 20)).ToString();
         if (!PlayerPrefs.HasKey("Name"))
-        PlayerPrefs.SetString("Name", "Player"+Random.Range(1000,10000));
+            PlayerPrefs.SetString("Name", "Player" + Random.Range(1000, 10000));
         PlayerName.text = PlayerPrefs.GetString("Name");
         ChangeMoney();
         if (PlayerPrefs.GetInt("Music") == 1)
@@ -82,7 +82,7 @@ public class Menu : MonoBehaviour
         }
         else
         {
-            SettingSprite[1].SetActive(true); 
+            SettingSprite[1].SetActive(true);
         }
         if (PlayerPrefs.GetInt("Qual") == 1)
         {
@@ -116,6 +116,16 @@ public class Menu : MonoBehaviour
         Loading.gameObject.SetActive(true);
         Loading.Load(0);
     }
+
+    public void LoadSurvival()
+    {
+        MainMaterial.color = Color.white;
+        MainMaterial.mainTextureOffset = new Vector2(cSkin * 1f / 6, 1);
+        HandsMaterial.color = balance.skin[PlayerPrefs.GetInt("CSkin")].HandsColor;
+        Loading.gameObject.SetActive(true);
+        Loading.Load(2);
+    }
+
     public void ResetProgress()
     {
         PlayerPrefs.DeleteAll();
@@ -185,7 +195,7 @@ public class Menu : MonoBehaviour
             SCost.text = balance.skin[cSkin].cost.ToString();
             MainMaterial.color = LockedColor;
             //HandsMaterial.color = LockedColor;
-           // MainMaterial.color = Color.white;
+            // MainMaterial.color = Color.white;
             MainMaterial.mainTextureOffset = new Vector2(cSkin * 1f / 6, 1);
             HandsMaterial.color = balance.skin[cSkin].HandsColor;
 
@@ -195,16 +205,16 @@ public class Menu : MonoBehaviour
             SLockScreen.SetActive(false);
             PlayerPrefs.SetInt("CSkin", cSkin);
             MainMaterial.color = Color.white;
-            MainMaterial.mainTextureOffset = new Vector2 (cSkin*1f / 6,1);
+            MainMaterial.mainTextureOffset = new Vector2(cSkin * 1f / 6, 1);
             HandsMaterial.color = balance.skin[cSkin].HandsColor;
         }
     }
     public void BuySkin()
     {
-        if (PlayerPrefs.GetInt("Money")>=balance.skin[cSkin].cost)
+        if (PlayerPrefs.GetInt("Money") >= balance.skin[cSkin].cost)
         {
             PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - balance.skin[cSkin].cost);
-            PlayerPrefs.SetInt("USkin"+ cSkin, 1);
+            PlayerPrefs.SetInt("USkin" + cSkin, 1);
             ChangeSkin(0);
             ChangeMoney();
             BuyEvent.Invoke();
@@ -218,7 +228,7 @@ public class Menu : MonoBehaviour
     }
     public void BuyWeapon()
     {
-        if (PlayerPrefs.GetInt("Money")>=balance.weapon[cWeapon].cost)
+        if (PlayerPrefs.GetInt("Money") >= balance.weapon[cWeapon].cost)
         {
             PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - balance.weapon[cWeapon].cost);
             PlayerPrefs.SetInt("UWeapon" + cWeapon, 1);
@@ -231,10 +241,10 @@ public class Menu : MonoBehaviour
     public void ChangeWeapon(int w)
     {
         cWeapon += w;
-        cWeapon = Mathf.Clamp(cWeapon,0, Weapon.Length-1);
+        cWeapon = Mathf.Clamp(cWeapon, 0, Weapon.Length - 1);
         if (cWeapon == 0) Arrow2[0].interactable = false;
         else Arrow2[0].interactable = true;
-        if (cWeapon == Weapon.Length-1) Arrow2[1].interactable = false;
+        if (cWeapon == Weapon.Length - 1) Arrow2[1].interactable = false;
         else Arrow2[1].interactable = true;
         if (PlayerPrefs.GetInt("UWeapon" + cWeapon) == 0)
         {
@@ -257,7 +267,7 @@ public class Menu : MonoBehaviour
     }
     void Update()
     {
-        WeaponTransform.localPosition = Vector3.Lerp(WeaponTransform.localPosition, 5*Vector3.right * cWeapon, 5*Time.deltaTime);
+        WeaponTransform.localPosition = Vector3.Lerp(WeaponTransform.localPosition, 5 * Vector3.right * cWeapon, 5 * Time.deltaTime);
     }
 }
 [System.Serializable]
