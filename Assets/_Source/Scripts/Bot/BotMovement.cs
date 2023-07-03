@@ -59,7 +59,18 @@ public class BotMovement : MonoBehaviour
 
     private void OnEnable()
     {
+        AIDifficulty = PlayerPrefs.GetInt("Wins");
+        //PlayersList = PlayersList.instance;
+        gameUI = GameUI.instance;
+        GetComponent<PlayerIndex>().playerStats = playerStats;
         RandomBehavior();
+        wall = playerStats.balance.MapSize - 1;
+        //Debug.Log(30 % 1000);
+        if (bot)
+        {
+            speed *= Mathf.Clamp(0.8f + 0.05f * AIDifficulty, 0.8f, 1.2f);
+            rotspeed *= Mathf.Clamp(0.5f + 0.05f * AIDifficulty, 0.5f, 1.1f);
+        }
     }
 
     private void OnTriggerEnter(Collider collision)
@@ -235,6 +246,7 @@ public class BotMovement : MonoBehaviour
             behTimer = 1;
         }
     }
+
     public void Defense()
     {
 
